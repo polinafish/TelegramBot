@@ -1,12 +1,12 @@
 import telebot
-#1918917952:AAEm_uxAr_zzk0EYetYDA0d9F-2hJ1g1VFM
+
 
 name = ''
 surname = ''
 age = 0
 
 
-bot = telebot.TeleBot('1918917952:AAEm_uxAr_zzk0EYetYDA0d9F-2hJ1g1VFM')
+bot = telebot.TeleBot('****')
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):

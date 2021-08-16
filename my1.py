@@ -5,8 +5,11 @@ name = ''
 surname = ''
 age = 0
 
+retryCount = 0
+maxRetryCount = 5
 
-bot = telebot.TeleBot('****')
+
+bot = telebot.TeleBot('***')
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
@@ -19,6 +22,7 @@ def echo_all(message):
     if message.text == 'Привет':
         bot.reply_to(message, 'Здравствуй, мой господин')
     elif message.text == '/reg':
+        retryCount = 0
         bot.send_message(message.from_user.id, 'Напиши своё имя, пёс!')
         bot.register_next_step_handler(message, reg_name)
 
@@ -32,17 +36,24 @@ def reg_surname(message):
     global surname
     surname = message.text
     bot.send_message(message.from_user.id, 'Написал сюда возраст, пёс!')
-    bot.register_next_step_handler(message, reg_age)
+    bot.register_next_step_handler(message, reg_age, 0)
 
-def reg_age(message):
+def reg_age(message, retryCount):
     global age
     #age = message.text
-    while age == 0:
+    if retryCount < maxRetryCount:
         try:
             age = int(message.text)
         except Exception:
             bot.send_message(message.from_user.id, 'Пиши цифрами, пёс!')
-    bot.register_next_step_handler(message, reg_ok)
+            retryCount = retryCount + 1
+            bot.register_next_step_handler(message, reg_age, retryCount)
+    if retryCount >= 5:
+        bot.send_message(message.from_user.id, 'Ну ты и тупой, говорил же цифрами пиши, пес!')
+        bot.clear_step_handler_by_chat_id(message.from_user.id)
+
+    if age != 0:
+        reg_ok(message)
 
 def reg_ok(message):
     bot.send_message(message.from_user.id, 'Тебе ' + str(age) + ' лет? И тебя зовут' + name + ' ' + surname +
